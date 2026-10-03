@@ -53,6 +53,8 @@
     <string name="reply_suggestions">Reply Suggestions</string>
     <string name="generate_replies">Generate Replies</string>
     <string name="generating_replies">Generating…</string>
+    <string name="generating_starters">Thinking of starters…</string>
+    <string name="starter_inserted">Starter inserted · keep typing to edit</string>
     <string name="cancel_generation">Cancel reply generation</string>
     <string name="generation_cancelled">Generation cancelled. Tap Generate to try again.</string>
     <string name="loading_client_context">Loading client context…</string>
@@ -62,7 +64,7 @@
     <string name="timeout_error">Reply request took too long. Tap Generate to retry.</string>
     <string name="generation_error">Could not generate replies. Check the backend and try again.</string>
     <string name="invalid_replies">The server did not return three replies. Please try again.</string>
-    <string name="connection_error">Request failed. Check the backend and USB connection, then try again.</string>
+    <string name="connection_error">Request failed. Check your internet connection and the backend, then try again.</string>
     <string name="switch_keyboard">Switch Keyboard</string>
     <string name="save_edited_reply">Save Edited Reply</string>
     <string name="save_reply">Save Reply</string>

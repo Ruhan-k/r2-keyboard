@@ -31,6 +31,8 @@ class FurryReplyInputMethodService : InputMethodService() {
 
     private var activeCall: Call<ReplyResponse>? = null
     private var activeClassifyCall: Call<ConversationStateClassificationResponse>? = null
+    private var activeStarterCall: Call<StarterResponse>? = null
+    private var suggestionMode = "REPLY"
     private var isLoadingContext = false
     private var generationToken = 0
     private var copiedMessageText = ""
@@ -122,7 +124,7 @@ class FurryReplyInputMethodService : InputMethodService() {
         keyboard.findViewById<Button>(R.id.use_clipboard_button).setOnClickListener { useClipboard() }
         keyboard.findViewById<Button>(R.id.use_current_context_button).setOnClickListener { useCurrentContext() }
         
-        val intents = listOf("AUTO", "CHILL", "FUNNY", "CUTE", "DRY", "FLIRTY", "ARTIST")
+        val intents = listOf("AUTO", "CHILL", "FUNNY", "CUTE", "DRY", "FLIRTY", "ARTIST", "RUDE")
         val intentButtons = intents.map { intent ->
             keyboard.findViewById<Button>(resources.getIdentifier("intent_${intent.lowercase()}", "id", packageName))
         }
@@ -148,6 +150,8 @@ class FurryReplyInputMethodService : InputMethodService() {
             }
         }
         updateIntentUI()
+
+        keyboard.findViewById<Button>(R.id.starter_button).setOnClickListener { generateStarters() }
 
         val adjustButton = keyboard.findViewById<Button>(R.id.adjust_modifier_button)
         selectedModifier = preferences.getString("selected_modifier", "NONE") ?: "NONE"
@@ -216,15 +220,19 @@ class FurryReplyInputMethodService : InputMethodService() {
                 val reply = button.text.toString()
                 suggestionClientId?.let { clientId ->
                     if (reply.isNotBlank() && clientId == selectedClientId && currentInputConnection?.commitText(reply, 1) == true) {
-                        
-                        saveReplyFeedback(clientId, reply, index + 1)
-                        statusText.text = "Reply inserted · keep typing to edit"
+                        if (suggestionMode == "STARTER") {
+                            // Starters are not replies to a message, so they never feed reply-style learning.
+                            statusText.setText(R.string.starter_inserted)
+                        } else {
+                            saveReplyFeedback(clientId, reply, index + 1)
+                            statusText.text = "Reply inserted · keep typing to edit"
+                        }
                     }
                 }
             }
         }
         generateButton.setOnClickListener {
-            if (activeCall != null || isLoadingContext) {
+            if (activeCall != null || activeStarterCall != null || isLoadingContext) {
                 ++generationToken
                 cancelGeneration()
         updateGenerateButton()
@@ -958,6 +966,124 @@ class FurryReplyInputMethodService : InputMethodService() {
         }
     }
 
+    private data class StarterRecord(val text: String, val topic: String, val timestamp: Long)
+
+    private fun starterHistory(clientId: Long): List<StarterRecord> {
+        val raw = preferences.getString("starter_history_$clientId", null) ?: return emptyList()
+        return try {
+            val array = org.json.JSONArray(raw)
+            (0 until array.length()).map {
+                val item = array.getJSONObject(it)
+                StarterRecord(item.getString("text"), item.optString("topic"), item.optLong("ts"))
+            }
+        } catch (_: Exception) {
+            emptyList()
+        }
+    }
+
+    // Remembers the starters shown for this client (newest last, capped) so the next ones differ.
+    private fun recordStarters(clientId: Long, texts: List<String>, topics: List<String>) {
+        val now = System.currentTimeMillis()
+        val updated = (starterHistory(clientId) + texts.mapIndexed { i, text -> StarterRecord(text, topics.getOrElse(i) { "" }, now) })
+            .takeLast(30)
+        val array = org.json.JSONArray()
+        updated.forEach { array.put(org.json.JSONObject().put("text", it.text).put("topic", it.topic).put("ts", it.timestamp)) }
+        preferences.edit().putString("starter_history_$clientId", array.toString()).apply()
+    }
+
+    private fun generateStarters() {
+        val clientId = selectedClientId ?: run { clientStatus.setText(R.string.no_client_selected); return }
+        if (activeCall != null || activeClassifyCall != null || activeStarterCall != null || isLoadingContext) return
+        resetReplies()
+        isLoadingContext = true
+        val requestToken = ++generationToken
+        val intent = selectedIntent
+        statusText.setText(R.string.generating_starters)
+        updateGenerateButton()
+        databaseExecutor.execute {
+            try {
+                val now = System.currentTimeMillis()
+                val recent = database.messageDao().getRecentForClient(clientId, 14).asReversed()
+                val memories = database.clientMemoryDao().getActiveForClient(clientId)
+                    .filter { it.category != "TEMPORARY" || (now - it.createdAt) <= 86400000L }
+                    .sortedByDescending { it.importance }.take(12)
+                val summary = database.conversationSummaryDao().getForClient(clientId)
+                val ownerStyle = database.styleProfileDao().get()?.summary.orEmpty()
+                val history = starterHistory(clientId).takeLast(20)
+                val request = StarterRequest(
+                    memories = memories.map { MemoryContext(it.key, it.value, it.importance, it.category) },
+                    recentMessages = recent.map { ConversationMessage(it.senderType, it.content, it.timestamp) },
+                    conversationSummary = summary?.content.orEmpty(),
+                    ownerStyle = ownerStyle,
+                    replyIntent = intent,
+                    recentStarters = history.map { StarterHistoryDto(it.text, it.topic) },
+                )
+                keyboard.post {
+                    if (requestToken != generationToken || clientId != selectedClientId) return@post
+                    isLoadingContext = false
+                    startStarterCall(requestToken, clientId, request)
+                }
+            } catch (_: Exception) {
+                keyboard.post {
+                    if (requestToken == generationToken) {
+                        isLoadingContext = false
+                        statusText.setText(R.string.generation_error)
+                        updateGenerateButton()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun startStarterCall(requestToken: Int, clientId: Long, request: StarterRequest) {
+        val call = ReplyClient.api.generateStarters(request)
+        call.timeout().timeout(30, TimeUnit.SECONDS)
+        activeStarterCall = call
+        statusText.setText(R.string.generating_starters)
+        updateGenerateButton()
+        call.enqueue(object : Callback<StarterResponse> {
+            override fun onResponse(call: Call<StarterResponse>, response: Response<StarterResponse>) {
+                if (activeStarterCall !== call) return
+                activeStarterCall = null
+                updateGenerateButton()
+                if (requestToken != generationToken || clientId != selectedClientId) { response.errorBody()?.close(); return }
+                if (!response.isSuccessful) {
+                    response.errorBody()?.close()
+                    statusText.setText(when (response.code()) {
+                        503 -> R.string.backend_not_configured
+                        429 -> R.string.rate_limit_error; 504 -> R.string.timeout_error; else -> R.string.generation_error })
+                    return
+                }
+                val starters = response.body()?.starters
+                if (starters == null || starters.size != 3 || starters.any { it.isNullOrBlank() }) { statusText.setText(R.string.invalid_replies); return }
+                val texts = starters.filterNotNull()
+                val topics = response.headers()["X-Starter-Topics"].orEmpty().split(",").map { it.trim() }
+                recordStarters(clientId, texts, topics)
+                suggestionMode = "STARTER"
+                suggestionClientId = clientId
+                currentSuggestions = texts
+                suggestionButtons.forEachIndexed { index, button -> button.text = texts[index]; button.visibility = View.VISIBLE }
+                keyboard.findViewById<View>(R.id.suggestions_empty).visibility = View.GONE
+                keyboard.findViewById<View>(R.id.suggestion_scroll).visibility = View.VISIBLE
+                keyboard.findViewById<android.widget.HorizontalScrollView>(R.id.suggestion_scroll).scrollTo(0, 0)
+                suggestionButtons.forEach { button -> button.setOnLongClickListener {
+                    val body = beginPanel("Full starter")
+                    body.addView(panelText(button.text.toString()))
+                    body.addView(panelButton("Insert starter") { closePanel(); button.performClick() })
+                    true
+                } }
+                statusText.text = ""
+            }
+
+            override fun onFailure(call: Call<StarterResponse>, error: Throwable) {
+                if (activeStarterCall !== call) return
+                activeStarterCall = null
+                updateGenerateButton()
+                statusText.setText(if (error is InterruptedIOException) R.string.timeout_error else R.string.connection_error)
+            }
+        })
+    }
+
     private fun saveMessage(clientId: Long, senderType: String, content: String) = databaseExecutor.execute {
         database.messageDao().insert(Message(clientId = clientId, senderType = senderType, content = content, timestamp = System.currentTimeMillis()))
     }
@@ -1187,7 +1313,7 @@ class FurryReplyInputMethodService : InputMethodService() {
         if (::suggestionButtons.isInitialized) resetReplies()
     }
     private fun resetReplies() {
-        suggestionClientId = null; currentSuggestions = emptyList()
+        suggestionClientId = null; currentSuggestions = emptyList(); suggestionMode = "REPLY"
         suggestionButtons.forEach { it.text = ""; it.visibility = View.GONE }
         keyboard.findViewById<View>(R.id.suggestions_empty).visibility = View.VISIBLE
         keyboard.findViewById<View>(R.id.suggestion_scroll).visibility = View.GONE
@@ -1195,7 +1321,7 @@ class FurryReplyInputMethodService : InputMethodService() {
     private fun
         updateGenerateButton() {
         if (::generateButton.isInitialized) {
-            val busy = activeCall != null || activeClassifyCall != null || isLoadingContext
+            val busy = activeCall != null || activeClassifyCall != null || activeStarterCall != null || isLoadingContext
             generateButton.isEnabled = busy || (selectedClientId != null && copiedMessageText.isNotBlank())
             generateButton.text = if (busy) getString(R.string.cancel) else "Generate"
             generateButton.contentDescription = getString(if (busy) R.string.cancel_generation else R.string.generate_replies)
@@ -1204,8 +1330,10 @@ class FurryReplyInputMethodService : InputMethodService() {
     private fun cancelGeneration() {
         activeCall?.cancel()
         activeClassifyCall?.cancel()
+        activeStarterCall?.cancel()
         activeCall = null
         activeClassifyCall = null
+        activeStarterCall = null
         isLoadingContext = false
     }
     override fun onFinishInputView(finishingInput: Boolean) {

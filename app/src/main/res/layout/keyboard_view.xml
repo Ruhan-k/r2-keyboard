@@ -26,9 +26,11 @@
                         <Button android:id="@+id/intent_dry" style="@style/FrControl" android:layout_width="wrap_content" android:layout_height="match_parent" android:text="DRY" android:minWidth="60dp" android:paddingHorizontal="8dp" android:textSize="12sp" android:layout_marginStart="4dp" />
                         <Button android:id="@+id/intent_flirty" style="@style/FrControl" android:layout_width="wrap_content" android:layout_height="match_parent" android:text="FLIRTY" android:minWidth="60dp" android:paddingHorizontal="8dp" android:textSize="12sp" android:layout_marginStart="4dp" />
                         <Button android:id="@+id/intent_artist" style="@style/FrControl" android:layout_width="wrap_content" android:layout_height="match_parent" android:text="ARTIST" android:minWidth="60dp" android:paddingHorizontal="8dp" android:textSize="12sp" android:layout_marginStart="4dp" />
+                        <Button android:id="@+id/intent_rude" style="@style/FrControl" android:layout_width="wrap_content" android:layout_height="match_parent" android:text="RUDE" android:minWidth="60dp" android:paddingHorizontal="8dp" android:textSize="12sp" android:layout_marginStart="4dp" />
                     </LinearLayout>
                 </HorizontalScrollView>
                 <Button android:id="@+id/adjust_modifier_button" style="@style/FrControl" android:layout_width="wrap_content" android:layout_height="28dp" android:text="Adjust" android:layout_marginStart="4dp" android:textSize="12sp" android:textColor="#BBAEFF" android:paddingHorizontal="10dp" />
+                <Button android:id="@+id/starter_button" style="@style/FrControl" android:layout_width="wrap_content" android:layout_height="28dp" android:text="💬 Starter" android:layout_marginStart="4dp" android:textSize="12sp" android:textColor="#BBAEFF" android:paddingHorizontal="10dp" android:contentDescription="Generate conversation starters" />
             </LinearLayout>
             <LinearLayout android:layout_width="match_parent" android:layout_height="48dp" android:gravity="center_vertical" android:orientation="horizontal">
                 <Button android:id="@+id/add_chat_context_button" style="@style/FrControl" android:layout_width="0dp" android:layout_height="44dp" android:layout_weight="0.7" android:text="＋ Ctx" android:contentDescription="Add Chat Context" />
@@ -61,5 +63,5 @@
     </ScrollView>
     <View android:layout_width="match_parent" android:layout_height="1dp" android:layout_marginVertical="5dp" android:layout_marginHorizontal="10dp" android:background="#2E3549" />
     <com.example.furryreply.QwertyKeyboardView android:id="@+id/qwerty_keyboard" android:layout_width="match_parent" android:layout_height="wrap_content" />
-    <TextView style="@style/FrCaption" android:layout_width="match_parent" android:layout_height="20dp" android:gravity="center" android:text="F U R R Y R E P L Y" android:textSize="9sp" android:textColor="#8E98AD" />
+    <TextView style="@style/FrCaption" android:layout_width="match_parent" android:layout_height="20dp" android:gravity="center" android:text="R 2   K E Y B O A R D" android:textSize="9sp" android:textColor="#8E98AD" />
 </LinearLayout>

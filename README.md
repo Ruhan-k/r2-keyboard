@@ -208,3 +208,19 @@ pass; a live Groq request returned three generated replies.
 - [FastAPI request bodies](https://fastapi.tiangolo.com/tutorial/body/)
 - [Retrofit](https://github.com/square/retrofit)
 - [Android network security](https://developer.android.com/privacy-and-security/security-config)
+
+## Personality, RUDE intent and Starter
+
+- Intents: AUTO, CHILL, FUNNY, CUTE, DRY, FLIRTY, ARTIST, RUDE. RUDE is casual roasting and
+  skepticism that tones itself down for serious messages (see `INTENT_GUIDANCE` in `backend/main.py`).
+- Texting style (lowercase, minimal punctuation, slang as vocabulary, punctuation/energy mirroring,
+  emoji and opener variety, no "I am an AI" answers) lives in `TEXTING_STYLE_RULES` in `backend/main.py`.
+  Each request also gets a computed TEXTING STYLE CONTEXT block listing emojis, slang and openers the
+  owner recently overused so the model avoids repeating them.
+- **💬 Starter** (next to Adjust) calls `POST /generate-starters` and shows three furry conversation
+  starters in the suggestion strip. Topic seeds live in `backend/starter_topics.py` (160+ seeds in
+  27 categories). The last 30 starters per client are stored locally in the keyboard preferences, the
+  last 20 are sent as an exclusion list, and recently used categories and facts already in client
+  memory are skipped. The response body is exactly `{"starters": [...]}`; the topics used come back in
+  the `X-Starter-Topics` header.
+- Backend tests: `cd backend && python -m unittest discover -p "test_*.py"`.

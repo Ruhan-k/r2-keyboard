@@ -79,6 +79,17 @@ data class MemoryExtractionResponse(
 data class ConversationSummaryRequest(val previousSummary: String, val messages: List<ConversationMessage>)
 data class ConversationSummaryResponse(val summary: String?)
 
+data class StarterHistoryDto(val text: String, val topic: String)
+data class StarterRequest(
+    val memories: List<MemoryContext>,
+    val recentMessages: List<ConversationMessage>,
+    val conversationSummary: String,
+    val ownerStyle: String,
+    val replyIntent: String,
+    val recentStarters: List<StarterHistoryDto>,
+)
+data class StarterResponse(val starters: List<String?>?)
+
 interface ReplyApi {
     @POST("generate-replies")
     fun generateReplies(@Body request: ReplyRequest): Call<ReplyResponse>
@@ -88,6 +99,9 @@ interface ReplyApi {
 
     @POST("summarize-conversation")
     fun summarizeConversation(@Body request: ConversationSummaryRequest): Call<ConversationSummaryResponse>
+
+    @POST("generate-starters")
+    fun generateStarters(@Body request: StarterRequest): Call<StarterResponse>
 
     @POST("classify-conversation-state")
     fun classifyConversationState(@Body request: ConversationStateClassificationRequest): Call<ConversationStateClassificationResponse>
