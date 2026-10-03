@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/clients_title"
+        android:textSize="22sp"
+        android:textStyle="bold" />
+
+    <Button
+        android:id="@+id/main_add_client_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/add_client"
+        android:textAllCaps="false" />
+
+    <ListView
+        android:id="@+id/client_list"
+        android:layout_width="match_parent"
+        android:layout_height="180dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/main_delete_client_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/delete_client"
+            android:textAllCaps="false" />
+
+        <Button
+            android:id="@+id/main_export_client_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="Export Client Data"
+            android:textAllCaps="false" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/main_selected_client"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="@string/select_client"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="@string/conversation_state_title"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/main_conversation_state_value"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="@string/conversation_state_default"
+        android:textSize="16sp"
+        android:typeface="monospace" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/conversation_state_mode_automatic" />
+
+        <Switch
+            android:id="@+id/main_conversation_state_mode_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:checked="true" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/conversation_state_mode_manual" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/main_pick_conversation_state_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:enabled="false"
+        android:text="@string/pick_conversation_state"
+        android:textAllCaps="false" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/messages_title"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/main_messages"
+        android:layout_width="match_parent"
+        android:layout_height="220dp"
+        android:paddingTop="8dp"
+        android:textSize="16sp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/memories_title"
+        android:textStyle="bold" />
+
+    <Button
+        android:id="@+id/main_add_memory_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/add_memory"
+        android:textAllCaps="false" />
+
+    <ListView
+        android:id="@+id/main_memories"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:paddingTop="8dp" />
+
+    <Button
+        android:id="@+id/main_edit_commission_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Client -> Commission"
+        android:textAllCaps="false" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/my_persona"
+        android:textSize="22sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/learned_style"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/main_style_count"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/no_learned_style" />
+
+    <TextView
+        android:id="@+id/main_style_summary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="@string/no_learned_style"
+        android:textSize="16sp" />
+
+    <Button
+        android:id="@+id/main_reset_style_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/reset_learned_style"
+        android:textAllCaps="false" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Adaptive AUTO"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/main_auto_stats"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="No analytics available"
+        android:textSize="14sp" />
+
+    <Button
+        android:id="@+id/main_reset_auto_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Reset AUTO learning"
+        android:textAllCaps="false" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Settings -> Backup &amp; Restore"
+        android:textSize="22sp"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/main_export_backup_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Export Backup"
+            android:textAllCaps="false" />
+
+        <Button
+            android:id="@+id/main_import_backup_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="Import Backup"
+            android:textAllCaps="false" />
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Settings -> Privacy"
+        android:textSize="22sp"
+        android:textStyle="bold" />
+
+    <Button
+        android:id="@+id/main_delete_all_data_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Delete All R2 Keyboard Data"
+        android:textColor="#C62828"
+        android:textAllCaps="false" />
+
+    <Button
+        android:id="@+id/main_clear_conversation_history_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Clear Conversation History"
+        android:textAllCaps="false" />
+
+    <Button
+        android:id="@+id/main_clear_client_memories_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Clear Client Memories"
+        android:textAllCaps="false" />
+
+    <Button
+        android:id="@+id/main_reset_keyboard_prefs_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Reset Keyboard Preferences"
+        android:textAllCaps="false" />
+
+</LinearLayout>
+</ScrollView>

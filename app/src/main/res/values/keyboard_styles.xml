@@ -1,0 +1,14 @@
+<resources>
+    <style name="FrBody">
+        <item name="android:textColor">#F2F4FC</item><item name="android:textSize">14sp</item><item name="android:fontFamily">sans</item>
+    </style>
+    <style name="FrCaption" parent="FrBody"><item name="android:textColor">#A3ADC2</item><item name="android:textSize">11sp</item></style>
+    <style name="FrControl" parent="@android:style/Widget.Material.Button">
+        <item name="android:background">@drawable/fr_control</item><item name="android:backgroundTint">@null</item><item name="android:textColor">#F2F4FC</item>
+        <item name="android:textAllCaps">false</item><item name="android:textSize">13sp</item><item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:minWidth">0dp</item><item name="android:minHeight">0dp</item><item name="android:paddingHorizontal">10dp</item><item name="android:paddingVertical">0dp</item>
+        <item name="android:stateListAnimator">@null</item><item name="android:elevation">0dp</item><item name="android:focusable">false</item>
+    </style>
+    <style name="FrPrimary" parent="FrControl"><item name="android:background">@drawable/fr_primary</item><item name="android:textColor">@color/fr_primary_text</item></style>
+    <style name="FrSuggestion" parent="FrControl"><item name="android:background">@drawable/fr_suggestion</item><item name="android:gravity">start|center_vertical</item><item name="android:paddingHorizontal">14dp</item><item name="android:maxLines">3</item><item name="android:textSize">14sp</item><item name="android:ellipsize">end</item></style>
+</resources>
